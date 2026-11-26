@@ -5,9 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kevin Celustka</title>
 <meta name="description" content="My work explores communities on the fringes of society and in close proximity to nature.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- The typeface comes from Google's server. The page does not wait for it: it is drawn at once in the nearest face the
+     device has, and changes to Caslon when that arrives (a stylesheet link would hold everything back until it answered). -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap"></noscript>
 <style>
 :root{padding:env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)}
 [hidden]{display:none !important}
@@ -459,21 +461,23 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
 
   // ---- one picture: its top-left corner never moves; how much of the page it takes is the only thing that changes ----
   const ready = new Map();   // the photographs either side of the one shown, fetched ahead
-  function large(name) {
+  function large(name, now) {
     const im = pic(name, true);
+    try { im.fetchPriority = now ? "high" : "low"; } catch (e) {}
     im.sizes = Math.ceil(fit(name) * dense()) + "px"; im.srcset = sources(name, LARGE); im.src = `photos/${LARGE[0]}/${name}.jpg`;
     return im;
   }
+  const stopFetch = (im) => { if (!im.complete) { im.removeAttribute("srcset"); im.removeAttribute("src"); } };   // stop a fetch nobody is waiting for
   function renderOne() {
     const home = view === "home", list = listNow();
     idx = Math.max(0, Math.min(list.length - 1, idx));
     const name = list[idx][0], one = el("div", "one");
     main.appendChild(one);
     syncStrip(false);
-    const im = ready.get(name) || large(name);
+    const im = ready.get(name) || large(name, true);
     im.classList.remove("back", "away"); im.style.transform = im.style.opacity = "";   // it may have been swiped away before
-    // until the large copy arrives, the copy the plane already has stands in for it
-    if (have.has(name) && !im.complete) im.style.backgroundImage = `url("${have.get(name)}")`;
+    // until the large copy arrives a small one stands in for it: the plane's if that has arrived, else the smallest
+    if (!im.complete) im.style.backgroundImage = `url("${have.get(name) || `photos/${SIZES[0]}/${name}.jpg`}")`;
     one.appendChild(im);
     const prev = el("button", "zone prev"), next = el("button", "zone next");
     prev.type = next.type = "button"; prev.setAttribute("aria-label", "Previous photograph"); next.setAttribute("aria-label", "Next photograph");
@@ -485,11 +489,20 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
     // the project's name opens the row of its photographs
     where.innerHTML = (home ? "" : `<button type="button" id="name" aria-controls="strip" aria-expanded="${strip}">${S[view].num}&ensp;${S[view].title}</button>`) + count;
     statusEl.textContent = (home ? "" : S[view].title + ", ") + "photograph " + (idx + 1) + " of " + list.length;
-    // the next two and the one before are fetched now, so turning to them shows them at once
+    // The next two and the one before are fetched ahead, so turning to them shows them at once: but only once this
+    // one has arrived, and one after another, so they never slow the photograph being looked at. One no longer
+    // near is let go, its fetch with it.
     const near = [1, 2, -1].map((d) => list[idx + d]).filter(Boolean).map((x) => x[0]);
-    for (const k of [...ready.keys()]) if (k !== name && !near.includes(k)) ready.delete(k);
+    for (const [k, p] of [...ready]) if (k !== name && !near.includes(k)) { stopFetch(p); ready.delete(k); }
     ready.set(name, im);
-    for (const n of near) if (!ready.has(n)) { const p = large(n); ready.set(n, p); if (p.decode) p.decode().catch(() => {}); }
+    const ahead = () => {
+      if (main.querySelector(".one img") !== im) return;   // turned away meanwhile
+      const n = near.find((x) => !ready.has(x)); if (!n) return;
+      const p = large(n, false); ready.set(n, p);
+      const then = () => { if (p.decode) p.decode().catch(() => {}); ahead(); };
+      if (p.complete) then(); else { p.addEventListener("load", then, { once: true }); p.addEventListener("error", ahead, { once: true }); }
+    };
+    if (im.complete) ahead(); else { im.addEventListener("load", ahead, { once: true }); im.addEventListener("error", ahead, { once: true }); }
   }
   // A photograph shown alone is as large as fits: it fills the room under the header and above the foot, stopped by
   // width or by height. So two photographs of the same shape are always the same size; on a wide window every
@@ -576,6 +589,8 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
   addEventListener("pointerup", letGo); addEventListener("pointercancel", letGo);
 
   function draw(fade) {
+    // leaving the plane: what it was still fetching in the background stops, so a photograph opened gets the line to itself
+    if (items) { gen++; for (const it of items) if (it.asked && !have.has(it.name)) { it.im.removeAttribute("srcset"); it.im.removeAttribute("src"); } }
     main.textContent = ""; where.textContent = ""; plane = null; items = null; vel.x = vel.y = glide.x = glide.y = 0;
     const wallOn = view === "home" && !open;
     root.dataset.view = view;
