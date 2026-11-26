@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kevin Celustka</title>
 <meta name="description" content="My work explores communities on the fringes of society and in close proximity to nature.">
-<!-- The typeface comes from Google's server. The page does not wait for it: it is drawn at once in the nearest face the
-     device has, and changes to Caslon when that arrives (a stylesheet link would hold everything back until it answered). -->
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap"></noscript>
+<!-- The typeface is served with the site (fonts/, Libre Caslon Text under the SIL Open Font License: fonts/OFL.txt).
+     The page does not wait for it: it is drawn at once in the nearest face the device has and changes to Caslon when
+     that arrives, which is asked for first. -->
+<link rel="preload" href="fonts/libre-caslon-text-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face{font-family:"Libre Caslon Text"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("fonts/libre-caslon-text-latin-ext.woff2") format("woff2");
+  unicode-range:U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF}
+@font-face{font-family:"Libre Caslon Text"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("fonts/libre-caslon-text-latin.woff2") format("woff2");
+  unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 :root{padding:env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)}
 [hidden]{display:none !important}
 /* kevincelustka.com. Written by scripts/build_site.py from site/index.tpl.html; edit the template, not public/.
@@ -99,6 +104,12 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
 .one{position:relative; margin-top:clamp(20px, 3vw, 44px); min-height:calc(100vh - 210px)}
 .one img{display:block; max-width:100%; height:auto; background-size:100% 100%; background-repeat:no-repeat}
 @supports (height:1svh){ .one{min-height:calc(100svh - 210px)} }
+/* one picture: the halves run down to the bottom of the window (sizeOne() sets the height from where .one starts), so a
+   finger anywhere under the header, the empty foot included, swipes or presses; nothing is left over to scroll */
+html.single{padding-bottom:0}   /* the foot already keeps clear of a phone's home bar */
+html.single main{padding-bottom:0; min-height:0}
+html.single .where > span{pointer-events:none}
+html.single .sr{top:0}   /* else the spoken line sits just under the photograph's place and leaves a pixel to scroll */
 /* the two halves you press to go back and on: a press shows nothing (a phone would otherwise darken the whole half) */
 .zone{position:absolute; top:0; bottom:0; width:50%; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; touch-action:pinch-zoom}
 .zoomed .zone{touch-action:auto}   /* pinched in: a finger moves the page about again */
@@ -421,6 +432,14 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
     const n = Math.hypot(dx, dy); if (n > 0.5) { lean.x = lean.x * 0.8 + (dx / n) * 0.2; lean.y = lean.y * 0.8 + (dy / n) * 0.2; }
     cam.x += dx; cam.y += dy; paint();
   }
+  // A press on the plane opens a photograph when the finger lifts; the browser then sends the click of that same press,
+  // which would land on whatever has opened under the finger (a half, which turns, the project's name or the x). So for
+  // 500 ms after (it opens as the pointer is let go) every click is swallowed and that pointer starts no swipe. Opening
+  // with Enter or Space goes another way and is not held up.
+  let hushed = null;
+  const hush = (id) => { hushed = { id, until: performance.now() + 500 }; };
+  const isHushed = () => !!hushed && performance.now() < hushed.until;
+  addEventListener("click", (e) => { if (isHushed()) { e.stopPropagation(); e.preventDefault(); } }, true);
   // dragging, with a click told apart from a drag by how far the pointer went
   let grab = null;
   main.addEventListener("pointerdown", (e) => {
@@ -441,7 +460,7 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
     if (!grab || e.pointerId !== grab.id) return;
     const g = grab; grab = null; if (plane) plane.classList.remove("held");
     if (e.type === "pointercancel") return;
-    if (g.far <= 5) { if (g.target.dataset && g.target.dataset.i !== undefined) openAt(+g.target.dataset.i); return; }
+    if (g.far <= 5) { if (g.target.dataset && g.target.dataset.i !== undefined) { hush(g.id); openAt(+g.target.dataset.i); } return; }
     if (!calm && performance.now() - g.t < 80) { vel.x = Math.max(-3, Math.min(3, g.vx)); vel.y = Math.max(-3, Math.min(3, g.vy)); kick(); }
   };
   main.addEventListener("pointerup", drop); main.addEventListener("pointercancel", drop);
@@ -517,6 +536,7 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
     const one = main.querySelector(".one"); if (!one) return;
     const im = one.querySelector("img"), w = fit(listNow()[idx][0]);
     im.style.width = w + "px"; im.sizes = Math.ceil(w * dense()) + "px";
+    one.style.minHeight = Math.max(0, Math.floor(innerHeight - (one.getBoundingClientRect().top + scrollY))) + "px";
   }
   function turn(d) {
     const list = listNow();
@@ -553,12 +573,12 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
   // A finger on one picture. Swiping sideways turns to the next photograph or the one before, as pressing either
   // half does (past a project's last photograph is the next project's first). Swiping up goes back to the plane.
   // The picture moves with the finger, so a swipe let go short is taken back. Pinched in, a finger moves the page.
-  let swipe = null, swiped = 0;
+  let swipe = null, swiped = -1e9;   // (not 0: performance.now() starts at the page load, so 0 would ignore presses in its first 400 ms)
   const pinched = () => !!window.visualViewport && visualViewport.scale > 1.02;
   if (window.visualViewport) visualViewport.addEventListener("resize", () => root.classList.toggle("zoomed", pinched()));
   main.addEventListener("pointerdown", (e) => {
     const one = main.querySelector(".one");
-    if (!one || !one.contains(e.target) || e.button || !e.isPrimary || pinched()) return;
+    if (!one || !one.contains(e.target) || e.button || !e.isPrimary || pinched() || (isHushed() && e.pointerId === hushed.id)) return;
     const im = one.querySelector("img"); im.classList.remove("back");
     swipe = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), axis: null, raw: 0, v: 0, can: false, im };
   });
@@ -594,6 +614,7 @@ main.bleed{max-width:none; padding-left:0; padding-right:0}
     main.textContent = ""; where.textContent = ""; plane = null; items = null; vel.x = vel.y = glide.x = glide.y = 0;
     const wallOn = view === "home" && !open;
     root.dataset.view = view;
+    root.classList.toggle("single", !wallOn && view !== "information");
     shutEl.hidden = wallOn || view === "information";   // the x at the foot: from one photograph back to the plane
     if (!S[view]) { strip = false; syncStrip(false); }
     if (wallOn) root.dataset.plane = ""; else delete root.dataset.plane;
