@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kevin Celustka</title>
+<meta name="description" content="My work explores communities on the fringes of society and in close proximity to nature.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text&display=swap">
+<style>
+:root{padding:env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)}
+[hidden]{display:none !important}
+/* kevincelustka.com. Written by scripts/build_site.py from site/index.tpl.html; edit the template, not public/.
+   Layout: the home page is a plane of every photograph that runs on in every direction; you arrive in the middle of
+   it and move it about. Everything else is one photograph at a time, hung from a fixed top-left corner of a 1200 px
+   frame that the name and "Information" also keep to. */
+:root{
+  color-scheme:light;
+  --paper:#fdfcfa;
+  --ink:#1b1a18;
+  --quiet:#6b6862;
+  --over:#e4e5e7;
+  --face:"Libre Caslon Text","Adobe Caslon Pro","Big Caslon","Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --gl:max(16px, 4vw, env(safe-area-inset-left, 0px));
+  --gr:max(16px, 4vw, env(safe-area-inset-right, 0px));
+  --gap:clamp(56px, 10vw, 150px);
+}
+html{background:var(--paper)}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font:400 15px/1.6 var(--face); font-synthesis:none;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  -webkit-text-size-adjust:100%; text-size-adjust:100%; overflow-x:clip;
+}
+a{color:inherit; text-decoration:none}
+button{font:inherit; color:inherit; background:none; border:0; padding:0; margin:0; cursor:pointer}
+a:focus-visible, button:focus-visible, img:focus-visible{outline:1px solid var(--ink); outline-offset:3px}
+h1,p,figure{margin:0; padding:0; font:inherit}
+.frame{max-width:1200px; margin:0 auto; padding:0 var(--gr) 0 var(--gl)}
+html{height:100%}
+html[data-plane]{overflow:hidden}
+html[data-plane] body{height:100%; overflow:hidden; overscroll-behavior:none}
+/* over the plane the name and the links float above the pictures and stay legible on any of them */
+html[data-plane] .top{position:fixed; left:0; right:0; top:0; z-index:4; mix-blend-mode:difference; color:var(--over); pointer-events:none;
+  padding-top:calc(20px + env(safe-area-inset-top, 0px))}
+html[data-plane] .top a{pointer-events:auto; color:inherit}
+
+.top{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; padding-top:20px}
+.top a{display:inline-flex; align-items:center; justify-content:center; min-height:44px; text-underline-offset:5px; text-decoration-thickness:1px}
+.name{font-size:17px; letter-spacing:.07em}
+.top nav, .top .nums{display:flex; align-items:center}
+.top .num{position:relative; min-width:38px; color:var(--quiet); letter-spacing:.06em}
+/* the project that is open: its numeral in ink with a point under it (a line under a link only reads as a link) */
+.top nav .num[aria-current]{text-decoration-line:none}
+.top .num[aria-current]::after{content:""; position:absolute; left:50%; bottom:4px; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:currentColor}
+.top .info{margin-left:22px}
+.top nav a:hover, .top nav a[aria-current]{text-decoration-line:underline}
+.top a[aria-current]{color:var(--ink)}
+
+main{padding-bottom:calc(var(--gap) + 40px); min-height:60vh}
+main:focus{outline:none}
+main.bleed{max-width:none; padding-left:0; padding-right:0}
+.turned main{animation:arrive .18s linear}
+@keyframes arrive{from{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .turned main{animation:none} }
+
+.words{padding-top:clamp(28px, 4vw, 56px); max-width:31em}
+.words p + p{margin-top:1.15em}
+.words .q{margin-top:2.4em; color:var(--quiet)}
+.words a{text-decoration:underline; text-underline-offset:4px; text-decoration-thickness:1px; display:inline-block; padding:10px 0; margin:-10px 0}
+
+/* the contact form, on Information: three lines to write on and one word to send */
+.contact{display:grid; max-width:31em}
+.contact label{color:var(--quiet); margin-top:14px}
+.contact input, .contact textarea{font:inherit; color:inherit; background:none; border:0; border-bottom:1px solid var(--quiet); border-radius:0;
+  box-sizing:border-box; width:100%; min-height:44px; padding:8px 0; margin:0; -webkit-appearance:none; appearance:none}
+.contact textarea{min-height:8em; resize:vertical; line-height:1.6}
+.contact input:focus-visible, .contact textarea:focus-visible{outline:none; border-bottom-color:var(--ink); box-shadow:0 1px 0 var(--ink)}
+.contact .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0}
+.contact button{justify-self:start; min-height:44px; margin-top:12px; text-decoration:underline; text-underline-offset:5px; text-decoration-thickness:1px}
+.contact button[disabled]{color:var(--quiet); cursor:default}
+.contact .status{min-height:1.6em; color:var(--quiet)}
+@media (max-width:699px){ .contact input, .contact textarea{font-size:16px} }   /* a phone zooms in on smaller type */
+
+/* the plane */
+.plane{position:fixed; inset:0; overflow:hidden; touch-action:none; cursor:grab; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none}
+.plane, .plane img{-webkit-tap-highlight-color:transparent}
+.plane.held{cursor:grabbing}
+.plane figure{position:absolute; left:0; top:0; will-change:transform}
+.plane img{display:block; width:100%; height:100%; -webkit-user-drag:none; background:color-mix(in srgb, var(--ink) 6%, var(--paper)); color:transparent; font-size:0}
+.hint{color:inherit; opacity:.7; transition:opacity .6s}
+.hint.gone{opacity:0}
+@media (prefers-reduced-motion:reduce){ .hint{transition:none} }
+
+/* one picture, registered to the top-left corner of the frame */
+.one{position:relative; margin-top:clamp(20px, 3vw, 44px); min-height:calc(100vh - 210px)}
+.one img{display:block; max-width:100%; height:auto; background-size:100% 100%; background-repeat:no-repeat}
+@supports (height:1svh){ .one{min-height:calc(100svh - 210px)} }
+/* the two halves you press to go back and on: a press shows nothing (a phone would otherwise darken the whole half) */
+.zone{position:absolute; top:0; bottom:0; width:50%; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; touch-action:pinch-zoom}
+.zoomed .zone{touch-action:auto}   /* pinched in: a finger moves the page about again */
+/* a swipe carries the picture with it: let go short and it comes back, far enough and it leaves */
+.one img.back{transition:transform .18s ease-out, opacity .18s ease-out}
+.one img.away{transition:transform .13s ease-in, opacity .13s ease-in}
+@media (prefers-reduced-motion:reduce){ .one img.back, .one img.away{transition:none} }
+.zone:focus:not(:focus-visible){outline:none}
+.zone.prev{left:0; cursor:w-resize} .zone.next{right:0; cursor:e-resize}
+.zone:focus-visible{outline-offset:-1px}
+
+/* the foot: where you are, legible over paper or picture */
+.bar{position:fixed; left:0; right:0; bottom:0; z-index:5; pointer-events:none; mix-blend-mode:difference; color:var(--over);
+  padding-bottom:calc(6px + env(safe-area-inset-bottom, 0px))}
+.bar .frame{display:flex; justify-content:space-between; align-items:center; min-height:44px}
+.bar button, .bar span, .bar a{pointer-events:auto}
+.where{display:flex; align-items:center; gap:1.4em; font-variant-numeric:tabular-nums}
+.where button, .where a{display:inline-flex; align-items:center; min-height:44px; text-decoration:underline; text-underline-offset:5px; text-decoration-thickness:1px}
+/* the two orders of the plane, to compare: as mixed, or grouped by colour */
+.sw{display:flex; gap:1.3em; pointer-events:auto; margin-left:auto; padding-left:1.3em}
+.sw button{display:inline-flex; align-items:center; min-height:44px; opacity:.7; text-underline-offset:5px; text-decoration-thickness:1px}
+.sw button[aria-pressed="true"]{opacity:1; text-decoration-line:underline}
+.x{pointer-events:auto; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; margin-right:-14px}
+.x svg{display:block; pointer-events:none}
+/* the project's photographs in a row above the foot, opened by its name */
+.strip{position:fixed; left:0; right:0; bottom:calc(50px + env(safe-area-inset-bottom, 0px)); z-index:4; background:var(--paper); padding:8px 0 6px; animation:arrive .18s linear}
+.strip .row{position:relative; display:flex; gap:6px; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; touch-action:pan-x}
+.strip .row::-webkit-scrollbar{display:none}
+.th{flex:none; padding:0 0 5px; border-bottom:1px solid transparent; opacity:.4; transition:opacity .15s; -webkit-tap-highlight-color:transparent}
+.th:hover{opacity:.75}
+.th[aria-current]{opacity:1; border-bottom-color:var(--ink)}
+.th img{display:block; height:56px; width:auto; -webkit-user-drag:none; background:color-mix(in srgb, var(--ink) 6%, var(--paper)); color:transparent; font-size:0}
+@media (max-width:699px){ .th img{height:48px} .strip .row{margin:0 calc(-1 * var(--gr)) 0 calc(-1 * var(--gl)); padding:0 var(--gr) 0 var(--gl)} }   /* a phone: the row runs to both edges */
+@media (prefers-reduced-motion:reduce){ .strip{animation:none} .th{transition:none} }
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
+
+@media (max-width:699px){
+  .top{padding-top:8px}
+  html[data-plane] .top{padding-top:calc(8px + env(safe-area-inset-top, 0px))}
+  /* a phone: the name and Information on one line, the numerals across the next */
+  .top nav{display:contents}
+  .top .info{order:2; margin-left:auto}
+  .top .nums{order:3; width:calc(100% + 16px); margin:0 -8px; justify-content:space-between}
+  .top .num{min-width:40px}
+}
+</style>
+</head>
+<body>
+
+<header class="top frame">
+  <a class="name" href="#home">Kevin Celustka</a>
+  <nav aria-label="Site">
+    <span class="nums">
+    <a class="num" href="#winter-windows" aria-label="Winter Windows">I</a>
+    <a class="num" href="#summerfolk" aria-label="Summerfolk">II</a>
+    <a class="num" href="#wonderland" aria-label="Wonderland">III</a>
+    <a class="num" href="#homecoming" aria-label="Homecoming">IV</a>
+    <a class="num" href="#dirtbagging" aria-label="Dirtbagging">V</a>
+    <a class="num" href="#av1" aria-label="AV1">VI</a>
+    <a class="num" href="#greece" aria-label="Greece">VII</a>
+    <a class="num" href="#moab" aria-label="Moab">VIII</a>
+    </span>
+    <a class="info" href="#information">Information</a>
+  </nav>
+</header>
+
+<main class="frame" id="main" tabindex="-1"></main>
+
+<div class="strip" id="strip" hidden><div class="frame"><div class="row" id="row"></div></div></div>
+<div class="bar"><div class="frame">
+  <div class="where" id="where"></div>
+  <div class="sw" id="sw" hidden><button type="button" data-order="mixed">Mixed</button><button type="button" data-order="colour">Color</button></div>
+  <button type="button" class="x" id="close" aria-label="Close" hidden><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></button>
+</div></div>
+<p class="sr" id="status" aria-live="polite"></p>
+
+<template id="info">
+  <div class="words">
+    <h1 class="sr">Information</h1>
+    <p>I’m Kevin, a photographer based in San Francisco.</p>
+    <p>My work explores communities on the fringes of society and in close proximity to nature. I take a documentary approach grounded in lasting relationships.</p>
+    <p>I spent 2021 and 2022 traveling the western United States embedded in the rock climbing community carrying a 35mm camera. My ongoing work is focused on isolated island communities in the San Juan Islands in Washington State.</p>
+    <p class="q">Prints</p>
+    <p>Limited edition prints are available upon request.</p>
+    <p class="q">Instagram</p>
+    <p><a href="https://www.instagram.com/kevincelustka/" target="_blank" rel="noopener">@kevincelustka</a></p>
+    <p class="q">Contact</p>
+    <form class="contact" id="contact" novalidate>
+      <label for="c-name">Name</label><input id="c-name" name="name" autocomplete="name" maxlength="120" required>
+      <label for="c-email">Email</label><input id="c-email" name="email" type="email" autocomplete="email" maxlength="200" required>
+      <label for="c-message">Message</label><textarea id="c-message" name="message" rows="5" maxlength="5000" required></textarea>
+      <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button type="submit">Send</button>
+      <p class="status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</template>
+
+<script>
+(() => {
+  "use strict";
+  const DATA = {"P":{"winter-windows-01":[1326,2000,"Winter Windows, 1 of 12"],"winter-windows-02":[1326,2000,"Winter Windows, 2 of 12"],"winter-windows-03":[1326,2000,"Winter Windows, 3 of 12"],"winter-windows-04":[1326,2000,"Winter Windows, 4 of 12"],"winter-windows-05":[1326,2000,"Winter Windows, 5 of 12"],"winter-windows-06":[1326,2000,"Winter Windows, 6 of 12"],"winter-windows-07":[1326,2000,"Winter Windows, 7 of 12"],"winter-windows-08":[1326,2000,"Winter Windows, 8 of 12"],"winter-windows-09":[1326,2000,"Winter Windows, 9 of 12"],"winter-windows-10":[1326,2000,"Winter Windows, 10 of 12"],"winter-windows-11":[1326,2000,"Winter Windows, 11 of 12"],"winter-windows-12":[1326,2000,"Winter Windows, 12 of 12"],"summerfolk-01":[2000,1600,"Summerfolk, 1 of 21"],"summerfolk-02":[2000,1600,"Summerfolk, 2 of 21"],"summerfolk-03":[2000,1600,"Summerfolk, 3 of 21"],"summerfolk-04":[2000,1600,"Summerfolk, 4 of 21"],"summerfolk-05":[2000,1601,"Summerfolk, 5 of 21"],"summerfolk-06":[2000,1601,"Summerfolk, 6 of 21"],"summerfolk-07":[2000,1600,"Summerfolk, 7 of 21"],"summerfolk-08":[2000,1613,"Summerfolk, 8 of 21"],"summerfolk-09":[2000,1600,"Summerfolk, 9 of 21"],"summerfolk-10":[2000,1600,"Summerfolk, 10 of 21"],"summerfolk-11":[2000,1600,"Summerfolk, 11 of 21"],"summerfolk-12":[2000,1600,"Summerfolk, 12 of 21"],"summerfolk-13":[2000,1600,"Summerfolk, 13 of 21"],"summerfolk-14":[2000,1600,"Summerfolk, 14 of 21"],"summerfolk-15":[2000,1601,"Summerfolk, 15 of 21"],"summerfolk-16":[2000,1600,"Summerfolk, 16 of 21"],"summerfolk-17":[2000,1600,"Summerfolk, 17 of 21"],"summerfolk-18":[2000,1600,"Summerfolk, 18 of 21"],"summerfolk-19":[2000,1600,"Summerfolk, 19 of 21"],"summerfolk-20":[2000,1600,"Summerfolk, 20 of 21"],"summerfolk-21":[2000,1601,"Summerfolk, 21 of 21"],"wonderland-01":[1648,2000,"Wonderland, 1 of 13"],"wonderland-02":[2000,1648,"Wonderland, 2 of 13"],"wonderland-03":[1647,2000,"Wonderland, 3 of 13"],"wonderland-04":[2000,1648,"Wonderland, 4 of 13"],"wonderland-05":[2000,1648,"Wonderland, 5 of 13"],"wonderland-06":[2000,1647,"Wonderland, 6 of 13"],"wonderland-07":[2000,1647,"Wonderland, 7 of 13"],"wonderland-08":[2000,1648,"Wonderland, 8 of 13"],"wonderland-09":[2000,1648,"Wonderland, 9 of 13"],"wonderland-10":[2000,1648,"Wonderland, 10 of 13"],"wonderland-11":[2000,1648,"Wonderland, 11 of 13"],"wonderland-12":[2000,1648,"Wonderland, 12 of 13"],"wonderland-13":[1601,2000,"Wonderland, 13 of 13"],"homecoming-01":[2000,1326,"Homecoming, 1 of 16"],"homecoming-02":[1601,2000,"Homecoming, 2 of 16"],"homecoming-03":[1632,2000,"Homecoming, 3 of 16"],"homecoming-04":[1632,2000,"Homecoming, 4 of 16"],"homecoming-05":[2000,1320,"Homecoming, 5 of 16"],"homecoming-06":[2000,1647,"Homecoming, 6 of 16"],"homecoming-07":[1648,2000,"Homecoming, 7 of 16"],"homecoming-08":[2000,1320,"Homecoming, 8 of 16"],"homecoming-09":[1600,2000,"Homecoming, 9 of 16"],"homecoming-10":[2000,1326,"Homecoming, 10 of 16"],"homecoming-11":[2000,1326,"Homecoming, 11 of 16"],"homecoming-12":[2000,1326,"Homecoming, 12 of 16"],"homecoming-13":[1600,2000,"Homecoming, 13 of 16"],"homecoming-14":[1600,2000,"Homecoming, 14 of 16"],"homecoming-15":[2000,1326,"Homecoming, 15 of 16"],"homecoming-16":[2000,1600,"Homecoming, 16 of 16"],"dirtbagging-01":[1326,2000,"Dirtbagging, 1 of 88"],"dirtbagging-02":[2000,1326,"Dirtbagging, 2 of 88"],"dirtbagging-03":[2000,1326,"Dirtbagging, 3 of 88"],"dirtbagging-04":[2000,1600,"Dirtbagging, 4 of 88"],"dirtbagging-05":[2000,1632,"Dirtbagging, 5 of 88"],"dirtbagging-06":[2000,1326,"Dirtbagging, 6 of 88"],"dirtbagging-07":[2000,1632,"Dirtbagging, 7 of 88"],"dirtbagging-08":[2000,1500,"Dirtbagging, 8 of 88"],"dirtbagging-09":[2000,1500,"Dirtbagging, 9 of 88"],"dirtbagging-10":[2000,1648,"Dirtbagging, 10 of 88"],"dirtbagging-11":[1647,2000,"Dirtbagging, 11 of 88"],"dirtbagging-12":[2000,1320,"Dirtbagging, 12 of 88"],"dirtbagging-13":[1320,2000,"Dirtbagging, 13 of 88"],"dirtbagging-14":[2000,1600,"Dirtbagging, 14 of 88"],"dirtbagging-15":[2000,1333,"Dirtbagging, 15 of 88"],"dirtbagging-16":[2000,1600,"Dirtbagging, 16 of 88"],"dirtbagging-17":[1600,2000,"Dirtbagging, 17 of 88"],"dirtbagging-18":[1600,2000,"Dirtbagging, 18 of 88"],"dirtbagging-19":[2000,1326,"Dirtbagging, 19 of 88"],"dirtbagging-20":[1600,2000,"Dirtbagging, 20 of 88"],"dirtbagging-21":[2000,1334,"Dirtbagging, 21 of 88"],"dirtbagging-22":[1326,2000,"Dirtbagging, 22 of 88"],"dirtbagging-23":[1326,2000,"Dirtbagging, 23 of 88"],"dirtbagging-24":[2000,1326,"Dirtbagging, 24 of 88"],"dirtbagging-25":[1600,2000,"Dirtbagging, 25 of 88"],"dirtbagging-26":[1601,2000,"Dirtbagging, 26 of 88"],"dirtbagging-27":[2000,1326,"Dirtbagging, 27 of 88"],"dirtbagging-28":[2000,1326,"Dirtbagging, 28 of 88"],"dirtbagging-29":[2000,1333,"Dirtbagging, 29 of 88"],"dirtbagging-30":[2000,1326,"Dirtbagging, 30 of 88"],"dirtbagging-31":[1500,2000,"Dirtbagging, 31 of 88"],"dirtbagging-32":[2000,1326,"Dirtbagging, 32 of 88"],"dirtbagging-33":[2000,1326,"Dirtbagging, 33 of 88"],"dirtbagging-34":[2000,1326,"Dirtbagging, 34 of 88"],"dirtbagging-35":[1326,2000,"Dirtbagging, 35 of 88"],"dirtbagging-36":[2000,1326,"Dirtbagging, 36 of 88"],"dirtbagging-37":[2000,1326,"Dirtbagging, 37 of 88"],"dirtbagging-38":[1326,2000,"Dirtbagging, 38 of 88"],"dirtbagging-39":[2000,1326,"Dirtbagging, 39 of 88"],"dirtbagging-40":[2000,1326,"Dirtbagging, 40 of 88"],"dirtbagging-41":[1325,2000,"Dirtbagging, 41 of 88"],"dirtbagging-42":[2000,1325,"Dirtbagging, 42 of 88"],"dirtbagging-43":[2000,1325,"Dirtbagging, 43 of 88"],"dirtbagging-44":[2000,1325,"Dirtbagging, 44 of 88"],"dirtbagging-45":[2000,1326,"Dirtbagging, 45 of 88"],"dirtbagging-46":[2000,1326,"Dirtbagging, 46 of 88"],"dirtbagging-47":[2000,1325,"Dirtbagging, 47 of 88"],"dirtbagging-48":[2000,1600,"Dirtbagging, 48 of 88"],"dirtbagging-49":[2000,1325,"Dirtbagging, 49 of 88"],"dirtbagging-50":[2000,1325,"Dirtbagging, 50 of 88"],"dirtbagging-51":[2000,1325,"Dirtbagging, 51 of 88"],"dirtbagging-52":[1632,2000,"Dirtbagging, 52 of 88"],"dirtbagging-53":[1632,2000,"Dirtbagging, 53 of 88"],"dirtbagging-54":[1632,2000,"Dirtbagging, 54 of 88"],"dirtbagging-55":[2000,1326,"Dirtbagging, 55 of 88"],"dirtbagging-56":[2000,1326,"Dirtbagging, 56 of 88"],"dirtbagging-57":[2000,1326,"Dirtbagging, 57 of 88"],"dirtbagging-58":[2000,1326,"Dirtbagging, 58 of 88"],"dirtbagging-59":[2000,1326,"Dirtbagging, 59 of 88"],"dirtbagging-60":[2000,1326,"Dirtbagging, 60 of 88"],"dirtbagging-61":[2000,1326,"Dirtbagging, 61 of 88"],"dirtbagging-62":[1600,2000,"Dirtbagging, 62 of 88"],"dirtbagging-63":[2000,1326,"Dirtbagging, 63 of 88"],"dirtbagging-64":[2000,1326,"Dirtbagging, 64 of 88"],"dirtbagging-65":[2000,1326,"Dirtbagging, 65 of 88"],"dirtbagging-66":[1500,2000,"Dirtbagging, 66 of 88"],"dirtbagging-67":[2000,1326,"Dirtbagging, 67 of 88"],"dirtbagging-68":[2000,1333,"Dirtbagging, 68 of 88"],"dirtbagging-69":[2000,1326,"Dirtbagging, 69 of 88"],"dirtbagging-70":[2000,1500,"Dirtbagging, 70 of 88"],"dirtbagging-71":[2000,1326,"Dirtbagging, 71 of 88"],"dirtbagging-72":[1500,2000,"Dirtbagging, 72 of 88"],"dirtbagging-73":[1326,2000,"Dirtbagging, 73 of 88"],"dirtbagging-74":[2000,1632,"Dirtbagging, 74 of 88"],"dirtbagging-75":[1600,2000,"Dirtbagging, 75 of 88"],"dirtbagging-76":[2000,1632,"Dirtbagging, 76 of 88"],"dirtbagging-77":[1632,2000,"Dirtbagging, 77 of 88"],"dirtbagging-78":[1632,2000,"Dirtbagging, 78 of 88"],"dirtbagging-79":[2000,1632,"Dirtbagging, 79 of 88"],"dirtbagging-80":[2000,1333,"Dirtbagging, 80 of 88"],"dirtbagging-81":[2000,1632,"Dirtbagging, 81 of 88"],"dirtbagging-82":[1333,2000,"Dirtbagging, 82 of 88"],"dirtbagging-83":[1326,2000,"Dirtbagging, 83 of 88"],"dirtbagging-84":[2000,1326,"Dirtbagging, 84 of 88"],"dirtbagging-85":[1326,2000,"Dirtbagging, 85 of 88"],"dirtbagging-86":[2000,1600,"Dirtbagging, 86 of 88"],"dirtbagging-87":[2000,1326,"Dirtbagging, 87 of 88"],"dirtbagging-88":[2000,1325,"Dirtbagging, 88 of 88"],"av1-01":[2000,1600,"AV1, 1 of 14"],"av1-02":[2000,1600,"AV1, 2 of 14"],"av1-03":[1600,2000,"AV1, 3 of 14"],"av1-04":[2000,1600,"AV1, 4 of 14"],"av1-05":[2000,1600,"AV1, 5 of 14"],"av1-06":[2000,1600,"AV1, 6 of 14"],"av1-07":[2000,1601,"AV1, 7 of 14"],"av1-08":[2000,1600,"AV1, 8 of 14"],"av1-09":[2000,1601,"AV1, 9 of 14"],"av1-10":[2000,1601,"AV1, 10 of 14"],"av1-11":[2000,1601,"AV1, 11 of 14"],"av1-12":[2000,1600,"AV1, 12 of 14"],"av1-13":[2000,1601,"AV1, 13 of 14"],"av1-14":[1600,2000,"AV1, 14 of 14"],"greece-01":[2000,1333,"Greece, 1 of 16"],"greece-02":[2000,1333,"Greece, 2 of 16"],"greece-03":[2000,1333,"Greece, 3 of 16"],"greece-04":[2000,1333,"Greece, 4 of 16"],"greece-05":[2000,1333,"Greece, 5 of 16"],"greece-06":[2000,1333,"Greece, 6 of 16"],"greece-07":[2000,1333,"Greece, 7 of 16"],"greece-08":[2000,1333,"Greece, 8 of 16"],"greece-09":[2000,1333,"Greece, 9 of 16"],"greece-10":[2000,1334,"Greece, 10 of 16"],"greece-11":[2000,1333,"Greece, 11 of 16"],"greece-12":[2000,1333,"Greece, 12 of 16"],"greece-13":[2000,1333,"Greece, 13 of 16"],"greece-14":[2000,1333,"Greece, 14 of 16"],"greece-15":[1333,2000,"Greece, 15 of 16"],"greece-16":[2000,1333,"Greece, 16 of 16"],"moab-01":[2000,1333,"Moab, 1 of 4"],"moab-02":[2000,1333,"Moab, 2 of 4"],"moab-03":[1333,2000,"Moab, 3 of 4"],"moab-04":[2000,1333,"Moab, 4 of 4"],"loose-01":[2000,1600,"Photograph"],"loose-02":[2000,1326,"Photograph"],"loose-03":[1597,2000,"Photograph"],"loose-04":[1600,2000,"Photograph"],"loose-05":[2000,1600,"Photograph"]},"S":{"winter-windows":{"num":"I","title":"Winter Windows","list":[["winter-windows-01"],["winter-windows-02"],["winter-windows-03"],["winter-windows-04"],["winter-windows-05"],["winter-windows-06"],["winter-windows-07"],["winter-windows-08"],["winter-windows-09"],["winter-windows-10"],["winter-windows-11"],["winter-windows-12"]]},"summerfolk":{"num":"II","title":"Summerfolk","list":[["summerfolk-01"],["summerfolk-02"],["summerfolk-03"],["summerfolk-04"],["summerfolk-05"],["summerfolk-06"],["summerfolk-07"],["summerfolk-08"],["summerfolk-09"],["summerfolk-10"],["summerfolk-11"],["summerfolk-12"],["summerfolk-13"],["summerfolk-14"],["summerfolk-15"],["summerfolk-16"],["summerfolk-17"],["summerfolk-18"],["summerfolk-19"],["summerfolk-20"],["summerfolk-21"]]},"wonderland":{"num":"III","title":"Wonderland","list":[["wonderland-01"],["wonderland-02"],["wonderland-03"],["wonderland-04"],["wonderland-05"],["wonderland-06"],["wonderland-07"],["wonderland-08"],["wonderland-09"],["wonderland-10"],["wonderland-11"],["wonderland-12"],["wonderland-13"]]},"homecoming":{"num":"IV","title":"Homecoming","list":[["homecoming-01"],["homecoming-02"],["homecoming-03"],["homecoming-04"],["homecoming-05"],["homecoming-06"],["homecoming-07"],["homecoming-08"],["homecoming-09"],["homecoming-10"],["homecoming-11"],["homecoming-12"],["homecoming-13"],["homecoming-14"],["homecoming-15"],["homecoming-16"]]},"dirtbagging":{"num":"V","title":"Dirtbagging","list":[["dirtbagging-01"],["dirtbagging-02"],["dirtbagging-03"],["dirtbagging-04"],["dirtbagging-05"],["dirtbagging-06"],["dirtbagging-07"],["dirtbagging-08"],["dirtbagging-09"],["dirtbagging-10"],["dirtbagging-11"],["dirtbagging-12"],["dirtbagging-13"],["dirtbagging-14"],["dirtbagging-15"],["dirtbagging-16"],["dirtbagging-17"],["dirtbagging-18"],["dirtbagging-19"],["dirtbagging-20"],["dirtbagging-21"],["dirtbagging-22"],["dirtbagging-23"],["dirtbagging-24"],["dirtbagging-25"],["dirtbagging-26"],["dirtbagging-27"],["dirtbagging-28"],["dirtbagging-29"],["dirtbagging-30"],["dirtbagging-31"],["dirtbagging-32"],["dirtbagging-33"],["dirtbagging-34"],["dirtbagging-35"],["dirtbagging-36"],["dirtbagging-37"],["dirtbagging-38"],["dirtbagging-39"],["dirtbagging-40"],["dirtbagging-41"],["dirtbagging-42"],["dirtbagging-43"],["dirtbagging-44"],["dirtbagging-45"],["dirtbagging-46"],["dirtbagging-47"],["dirtbagging-48"],["dirtbagging-49"],["dirtbagging-50"],["dirtbagging-51"],["dirtbagging-52"],["dirtbagging-53"],["dirtbagging-54"],["dirtbagging-55"],["dirtbagging-56"],["dirtbagging-57"],["dirtbagging-58"],["dirtbagging-59"],["dirtbagging-60"],["dirtbagging-61"],["dirtbagging-62"],["dirtbagging-63"],["dirtbagging-64"],["dirtbagging-65"],["dirtbagging-66"],["dirtbagging-67"],["dirtbagging-68"],["dirtbagging-69"],["dirtbagging-70"],["dirtbagging-71"],["dirtbagging-72"],["dirtbagging-73"],["dirtbagging-74"],["dirtbagging-75"],["dirtbagging-76"],["dirtbagging-77"],["dirtbagging-78"],["dirtbagging-79"],["dirtbagging-80"],["dirtbagging-81"],["dirtbagging-82"],["dirtbagging-83"],["dirtbagging-84"],["dirtbagging-85"],["dirtbagging-86"],["dirtbagging-87"],["dirtbagging-88"]]},"av1":{"num":"VI","title":"AV1","list":[["av1-01"],["av1-02"],["av1-03"],["av1-04"],["av1-05"],["av1-06"],["av1-07"],["av1-08"],["av1-09"],["av1-10"],["av1-11"],["av1-12"],["av1-13"],["av1-14"]]},"greece":{"num":"VII","title":"Greece","list":[["greece-01"],["greece-02"],["greece-03"],["greece-04"],["greece-05"],["greece-06"],["greece-07"],["greece-08"],["greece-09"],["greece-10"],["greece-11"],["greece-12"],["greece-13"],["greece-14"],["greece-15"],["greece-16"]]},"moab":{"num":"VIII","title":"Moab","list":[["moab-01"],["moab-02"],["moab-03"],["moab-04"]]}},"H":[["dirtbagging-01",1,"dirtbagging"],["dirtbagging-02",1,"dirtbagging"],["summerfolk-01",1,"summerfolk"],["dirtbagging-03",1,"dirtbagging"],["homecoming-01",1,"homecoming"],["greece-01",1,"greece"],["av1-01",1,"av1"],["wonderland-01",1,"wonderland"],["dirtbagging-04",1,"dirtbagging"],["winter-windows-01",1,"winter-windows"],["dirtbagging-05",1,"dirtbagging"],["dirtbagging-06",1,"dirtbagging"],["summerfolk-02",1,"summerfolk"],["dirtbagging-07",1,"dirtbagging"],["dirtbagging-08",1,"dirtbagging"],["homecoming-02",2,"homecoming"],["greece-02",1,"greece"],["dirtbagging-09",1,"dirtbagging"],["loose-01",1,""],["av1-02",1,"av1"],["dirtbagging-10",1,"dirtbagging"],["wonderland-02",1,"wonderland"],["summerfolk-03",1,"summerfolk"],["dirtbagging-11",2,"dirtbagging"],["winter-windows-02",1,"winter-windows"],["moab-01",2,"moab"],["dirtbagging-12",1,"dirtbagging"],["dirtbagging-13",2,"dirtbagging"],["dirtbagging-14",1,"dirtbagging"],["homecoming-03",1,"homecoming"],["greece-03",1,"greece"],["dirtbagging-15",1,"dirtbagging"],["summerfolk-04",2,"summerfolk"],["dirtbagging-16",1,"dirtbagging"],["av1-03",1,"av1"],["dirtbagging-17",1,"dirtbagging"],["wonderland-03",1,"wonderland"],["dirtbagging-18",1,"dirtbagging"],["winter-windows-03",1,"winter-windows"],["dirtbagging-19",1,"dirtbagging"],["summerfolk-05",1,"summerfolk"],["homecoming-04",1,"homecoming"],["greece-04",1,"greece"],["dirtbagging-20",1,"dirtbagging"],["dirtbagging-21",1,"dirtbagging"],["dirtbagging-22",1,"dirtbagging"],["av1-04",1,"av1"],["dirtbagging-23",1,"dirtbagging"],["summerfolk-06",2,"summerfolk"],["dirtbagging-24",1,"dirtbagging"],["wonderland-04",1,"wonderland"],["dirtbagging-25",1,"dirtbagging"],["homecoming-05",1,"homecoming"],["greece-05",1,"greece"],["dirtbagging-26",1,"dirtbagging"],["winter-windows-04",1,"winter-windows"],["loose-02",2,""],["dirtbagging-27",1,"dirtbagging"],["summerfolk-07",1,"summerfolk"],["dirtbagging-28",1,"dirtbagging"],["av1-05",1,"av1"],["dirtbagging-29",1,"dirtbagging"],["dirtbagging-30",1,"dirtbagging"],["homecoming-06",1,"homecoming"],["greece-06",1,"greece"],["wonderland-05",1,"wonderland"],["dirtbagging-31",1,"dirtbagging"],["summerfolk-08",1,"summerfolk"],["dirtbagging-32",1,"dirtbagging"],["dirtbagging-33",1,"dirtbagging"],["winter-windows-05",1,"winter-windows"],["moab-02",2,"moab"],["dirtbagging-34",1,"dirtbagging"],["dirtbagging-35",1,"dirtbagging"],["av1-06",1,"av1"],["dirtbagging-36",1,"dirtbagging"],["summerfolk-09",2,"summerfolk"],["homecoming-07",1,"homecoming"],["greece-07",2,"greece"],["dirtbagging-37",1,"dirtbagging"],["wonderland-06",1,"wonderland"],["dirtbagging-38",1,"dirtbagging"],["dirtbagging-39",1,"dirtbagging"],["dirtbagging-40",1,"dirtbagging"],["summerfolk-10",1,"summerfolk"],["winter-windows-06",1,"winter-windows"],["dirtbagging-41",1,"dirtbagging"],["av1-07",1,"av1"],["homecoming-08",2,"homecoming"],["greece-08",1,"greece"],["dirtbagging-42",1,"dirtbagging"],["dirtbagging-43",1,"dirtbagging"],["dirtbagging-44",1,"dirtbagging"],["loose-03",1,""],["summerfolk-11",1,"summerfolk"],["wonderland-07",1,"wonderland"],["dirtbagging-45",1,"dirtbagging"],["dirtbagging-46",1,"dirtbagging"],["dirtbagging-47",1,"dirtbagging"],["homecoming-09",1,"homecoming"],["greece-09",2,"greece"],["av1-08",1,"av1"],["dirtbagging-48",2,"dirtbagging"],["winter-windows-07",1,"winter-windows"],["summerfolk-12",2,"summerfolk"],["dirtbagging-49",1,"dirtbagging"],["dirtbagging-50",1,"dirtbagging"],["dirtbagging-51",1,"dirtbagging"],["wonderland-08",1,"wonderland"],["dirtbagging-52",1,"dirtbagging"],["homecoming-10",1,"homecoming"],["greece-10",1,"greece"],["summerfolk-13",1,"summerfolk"],["dirtbagging-53",1,"dirtbagging"],["av1-09",1,"av1"],["dirtbagging-54",1,"dirtbagging"],["dirtbagging-55",1,"dirtbagging"],["winter-windows-08",1,"winter-windows"],["moab-03",1,"moab"],["dirtbagging-56",1,"dirtbagging"],["dirtbagging-57",1,"dirtbagging"],["summerfolk-14",1,"summerfolk"],["dirtbagging-58",1,"dirtbagging"],["wonderland-09",1,"wonderland"],["homecoming-11",2,"homecoming"],["greece-11",2,"greece"],["dirtbagging-59",1,"dirtbagging"],["dirtbagging-60",1,"dirtbagging"],["av1-10",1,"av1"],["dirtbagging-61",1,"dirtbagging"],["summerfolk-15",2,"summerfolk"],["dirtbagging-62",1,"dirtbagging"],["loose-04",1,""],["winter-windows-09",1,"winter-windows"],["dirtbagging-63",1,"dirtbagging"],["homecoming-12",1,"homecoming"],["greece-12",1,"greece"],["dirtbagging-64",1,"dirtbagging"],["wonderland-10",1,"wonderland"],["dirtbagging-65",1,"dirtbagging"],["summerfolk-16",1,"summerfolk"],["dirtbagging-66",1,"dirtbagging"],["av1-11",1,"av1"],["dirtbagging-67",2,"dirtbagging"],["dirtbagging-68",1,"dirtbagging"],["dirtbagging-69",1,"dirtbagging"],["homecoming-13",1,"homecoming"],["greece-13",1,"greece"],["summerfolk-17",1,"summerfolk"],["dirtbagging-70",1,"dirtbagging"],["winter-windows-10",1,"winter-windows"],["dirtbagging-71",1,"dirtbagging"],["wonderland-11",1,"wonderland"],["dirtbagging-72",1,"dirtbagging"],["av1-12",1,"av1"],["dirtbagging-73",1,"dirtbagging"],["summerfolk-18",2,"summerfolk"],["dirtbagging-74",1,"dirtbagging"],["homecoming-14",1,"homecoming"],["greece-14",1,"greece"],["dirtbagging-75",1,"dirtbagging"],["dirtbagging-76",1,"dirtbagging"],["dirtbagging-77",1,"dirtbagging"],["winter-windows-11",1,"winter-windows"],["moab-04",1,"moab"],["dirtbagging-78",1,"dirtbagging"],["summerfolk-19",1,"summerfolk"],["wonderland-12",1,"wonderland"],["dirtbagging-79",1,"dirtbagging"],["av1-13",1,"av1"],["loose-05",1,""],["dirtbagging-80",1,"dirtbagging"],["homecoming-15",1,"homecoming"],["greece-15",1,"greece"],["dirtbagging-81",2,"dirtbagging"],["dirtbagging-82",1,"dirtbagging"],["summerfolk-20",1,"summerfolk"],["dirtbagging-83",1,"dirtbagging"],["dirtbagging-84",1,"dirtbagging"],["winter-windows-12",1,"winter-windows"],["dirtbagging-85",1,"dirtbagging"],["wonderland-13",1,"wonderland"],["av1-14",2,"av1"],["homecoming-16",1,"homecoming"],["greece-16",1,"greece"],["dirtbagging-86",1,"dirtbagging"],["summerfolk-21",1,"summerfolk"],["dirtbagging-87",1,"dirtbagging"],["dirtbagging-88",1,"dirtbagging"]],"C":[[90,2],[120,8],[101,22],[66,4],[149,12],[56,0],[63,6],[153,14],[62,10],[54,24],[4,26],[136,20],[6,16],[169,18],[118,8],[147,20],[156,12],[100,0],[112,4],[173,10],[154,26],[131,14],[83,2],[111,6],[157,16],[99,24],[5,12],[53,0],[148,4],[180,18],[129,10],[64,12],[124,14],[0,4],[126,10],[159,12],[58,18],[80,24],[176,26],[182,20],[2,22],[125,6],[140,8],[102,4],[160,10],[158,14],[185,16],[31,18],[12,22],[134,12],[183,8],[74,20],[84,0],[164,2],[42,26],[25,10],[186,4],[116,16],[52,12],[170,8],[28,0],[95,18],[110,14],[121,16],[166,26],[20,8],[130,2],[151,12],[144,22],[104,24],[1,10],[69,14],[65,18],[33,26],[29,20],[18,0],[178,22],[14,8],[91,0],[78,12],[108,18],[97,4],[19,6],[123,20],[61,12],[96,10],[82,8],[30,14],[184,16],[187,6],[40,26],[16,12],[138,20],[34,14],[81,4],[87,10],[22,26],[89,8],[41,6],[174,22],[171,16],[161,24],[11,12],[168,20],[26,0],[36,4],[94,26],[10,10],[109,24],[86,6],[143,8],[113,26],[145,22],[59,4],[46,20],[93,10],[133,24],[27,8],[24,26],[13,6],[35,16],[175,18],[98,20],[15,22],[23,0],[8,12],[119,24],[167,4],[128,16],[181,18],[72,4],[37,10],[44,24],[3,22],[85,26],[177,20],[73,12],[17,14],[114,18],[71,16],[141,0],[132,2],[107,8],[106,10],[92,20],[179,26],[163,16],[172,22],[75,24],[117,18],[55,20],[79,26],[162,4],[51,6],[142,2],[38,14],[39,22],[21,8],[127,0],[67,16],[45,26],[103,18],[49,4],[57,10],[7,12],[115,2],[155,6],[9,20],[139,16],[188,8],[146,26],[122,18],[48,0],[137,14],[88,22],[77,12],[60,4],[165,2],[43,20],[70,16],[68,8],[105,10],[76,4],[135,26],[50,0],[47,18],[150,20],[32,14],[152,0]]};
+  const P = DATA.P, S = DATA.S, HOME = DATA.H;           // HOME: [name, columns wide, project]
+  const LOOSE = HOME.filter((h) => !h[2]);               // the photographs on the plane that are in no project
+  // The plane has two orders: mixed (HOME as it is), and grouped by colour into a gradient (DATA.C: for each place
+  // down the plane, a place in HOME and the column it hangs in; scripts/colour_order.py works it out).
+  const BYCOLOUR = DATA.C && DATA.C.length === HOME.length ? DATA.C : null;
+  // You arrive in the colour order; the switch at the foot goes to the mixed one, and the choice is remembered.
+  let colour = !!BYCOLOUR; try { if (localStorage.getItem("plane") === "mixed") colour = false; } catch (e) {}
+  const listNow = () => view === "home" ? LOOSE : S[view].list;
+  const ORDER = ["winter-windows", "summerfolk", "wonderland", "homecoming", "dirtbagging", "av1", "greece", "moab"];
+  const root = document.documentElement, main = document.getElementById("main"), where = document.getElementById("where");
+  const statusEl = document.getElementById("status");
+  const swEl = document.getElementById("sw");
+  const stripEl = document.getElementById("strip"), row = document.getElementById("row"), shutEl = document.getElementById("close");
+  const SIZES = [360, 640, 1280, 2000];   // long edge of each copy, small to large
+  const widthAt = (name, size) => Math.round(P[name][0] * Math.min(1, size / Math.max(P[name][0], P[name][1])));
+  const sources = (name, sizes) => sizes.map((z) => `photos/${z}/${name}.jpg ${widthAt(name, z)}w`).join(", ");
+  // The plane shows the copies up to 1280, a photograph alone the copies from 1280 up. A screen with three dots to
+  // the point is served as if it had two: nothing is lost to the eye and a phone fetches about half as much.
+  const SMALL = SIZES.filter((z) => z <= 1280), LARGE = SIZES.filter((z) => z >= 1280).length ? SIZES.filter((z) => z >= 1280) : SIZES.slice(-1);
+  const dense = () => Math.min(1, 2 / (window.devicePixelRatio || 1));
+  const have = new Map();   // photographs whose plane copy has arrived, and which file it was
+  const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html) e.innerHTML = html; return e; };
+  const named = () => { const h = location.hash.slice(1); return S[h] || h === "information" ? h : "home"; };
+
+  // The home page is a plane. Every photograph sits on it with the working wall's spacing (columns of about 170 px,
+  // gutters nearly half a column, each frame a little off its line, uneven gaps, a place left empty now and then).
+  // The plane has no edge: going far enough in any direction brings the same photographs round again. You arrive
+  // in the middle and move by dragging, by scrolling (a trackpad goes both ways) or with the arrow keys.
+  let view = named(), idx = 0, open = false, pendingIdx = null;
+  let plane = null, items = null, tile = { w: 1, h: 1 }, cam = null, vel = { x: 0, y: 0 }, glide = { x: 0, y: 0 }, raf = 0, moved = false;
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function pic(name, eager) {
+    const [w, h, alt] = P[name], im = document.createElement("img");
+    im.setAttribute("width", w); im.setAttribute("height", h); im.alt = alt; im.decoding = "async";
+    if (!eager) im.loading = "lazy";
+    return im;
+  }
+
+  // ---- the plane ------------------------------------------------------------------------------------------
+  function renderPlane() {
+    plane = el("div", "plane");
+    items = (colour ? BYCOLOUR : HOME.map((_, i) => [i])).map(([i, col]) => {
+      const [name, span] = HOME[i], f = el("figure"), im = pic(name, true);
+      im.dataset.i = i; im.tabIndex = 0; im.setAttribute("role", "button"); im.draggable = false;
+      f.appendChild(im); plane.appendChild(f);
+      return { f, im, name, r: P[name][1] / P[name][0], kim: span, col, x: 0, y: 0, w: 1, h: 1, on: false, asked: false, d: 0 };
+    });
+    gen++; urgent = flying = 0;
+    main.appendChild(plane);
+    layPlane();
+    where.innerHTML = moved ? "" : `<span class="hint" id="hint">Drag, scroll or use the arrow keys to move</span>`;
+  }
+  const rnd = (n) => { let t = (n * 7919 + 0x6D2B79F5) | 0; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  function put(it, x, y, w) { it.x = x; it.y = y; it.w = w; it.h = w * it.r; }
+  // The grid is in half columns. Each frame goes to the leftmost place where it sits highest, so left edges fall on
+  // a few lines and tops never do.
+  function pack(items, units, uw, g, W, o) {
+    const hs = new Array(units).fill(0);
+    if (o.stagger) for (let c = 0; c < units; c++) hs[c] = rnd((c >> 1) * 13 + 5) * o.stagger;
+    if (o.ramp) for (let c = 0; c < units; c++) hs[c] = (c >> 1) * o.ramp;
+    items.forEach((it, n) => {
+      const i = +it.im.dataset.i, span = Math.min(units, o.span(it, i)), slot = uw * span + g * (span - 1); let best = null;
+      // grouped by colour, a frame has its own column (o.at); otherwise it goes wherever it sits highest
+      const c0 = o.at ? Math.min(o.at(it), units - span) : 0, c1 = o.at ? c0 : units - span;
+      for (let c = c0; c <= c1; c++) {
+        let y = Math.max(...hs.slice(c, c + span));
+        // a place that must stay empty pushes the frame down past it
+        for (let again = true; again;) { again = false; for (const a of o.avoid || []) {
+          const x = c * (uw + g) - o.jx;
+          if (x < a.x1 && x + slot + 2 * o.jx > a.x0 && y < a.y1 && y + slot * it.r > a.y0) { y = a.y1; again = true; }
+        } }
+        if (!best || y < best.y - 0.5) best = { c, y };
+      }
+      const w = slot; let x = best.c * (uw + g);
+      x += (rnd(i + 1) - 0.5) * o.jx;
+      put(it, Math.max(0, Math.min(W - w, x)), best.y, w); it.c = best.c;                 // never past the edge
+      let under = g * (0.45 + rnd(i + 101) * 1.3);
+      if (o.holes && rnd(i + 201) < o.holes) under += Math.min(slot, o.holeMax || slot) * (0.45 + 0.6 * rnd(i + 211)); // a place left empty
+      for (let c = best.c; c < best.c + span; c++) hs[c] = best.y + w * it.r + under;
+    });
+    return Math.max(...hs) - g;
+  }
+  const COLS = 14;
+  function layPlane() {
+    if (!items) return;
+    const vw = innerWidth, vh = innerHeight, ratio = 0.45, cw0 = vw < 520 ? 112 : 170, g0 = cw0 * ratio;
+    const o = { span: (it) => it.kim * 2, jx: cw0 * 0.34, holes: 0.17, stagger: cw0 * 0.75 };
+    if (colour) o.at = (it) => it.col;
+    const w0 = COLS * (cw0 + g0); let h0 = pack(items, COLS * 2, (cw0 - g0) / 2, g0, w0, o) + g0;
+    // the plane must be larger than the window by more than the largest frame, so nothing is ever in view twice
+    const k = Math.max(1, (vw + cw0 * 4) / w0, (vh + cw0 * 4) / h0);
+    // Where you arrive, nothing sits under the name, the links or the line at the foot: those three places are
+    // left empty when the plane is laid, the way a place is left empty elsewhere on it.
+    const sx = w0 / 2 - vw / k / 2, sy = Math.round(h0 / 2 - vh / k / 2), pad = 16;
+    const nameBox = document.querySelector(".name").getBoundingClientRect();
+    const boxes = [nameBox, document.querySelector(".top .nums").getBoundingClientRect(), document.querySelector(".top .info").getBoundingClientRect(),
+      { left: nameBox.left, right: nameBox.left + 330, top: vh - 58, bottom: vh }];
+    o.avoid = boxes.map((b) => ({ x0: sx + (b.left - pad) / k, x1: sx + (b.right + pad) / k, y0: sy + (b.top - pad) / k, y1: sy + (b.bottom + pad) / k }));
+    h0 = pack(items, COLS * 2, (cw0 - g0) / 2, g0, w0, o) + g0;
+    for (const it of items) {
+      it.x *= k; it.y *= k; it.w *= k; it.h *= k;
+      Object.assign(it.f.style, { width: it.w + "px", height: it.h + "px" });
+      it.im.sizes = Math.ceil(it.w * dense()) + "px"; it.on = null;   // unknown until painted, so anything out of view is hidden
+    }
+    const was = cam && moved ? [(cam.x + vw / 2) / tile.w, (cam.y + vh / 2) / tile.h] : null;
+    tile = { w: w0 * k, h: h0 * k };
+    cam = was ? { x: was[0] * tile.w - vw / 2, y: was[1] * tile.h - vh / 2 } : { x: sx * k, y: sy * k };   // arrive in the middle
+    paint();
+  }
+  const mod = (a, n) => ((a % n) + n) % n;
+  // Photographs are asked for before they are needed. What is in view goes first. Then, a few at a time and nearest
+  // first (leaning the way the plane is moving), everything around it, until the whole plane has arrived: after
+  // that there is nothing left to wait for, whichever way you go.
+  let gen = 0, urgent = 0, flying = 0, lean = { x: 0, y: 0 }, pace = 500;   // pace: how long a photograph has been taking, in ms
+  const thrifty = !!(navigator.connection && navigator.connection.saveData);
+  function ask(it, now) {
+    const g = gen, im = it.im, t0 = performance.now(); it.asked = true;
+    if (now) urgent++; else flying++;
+    const done = (ok) => {
+      if (ok) { have.set(it.name, im.currentSrc || im.src); if (it.on && im.decode) im.decode().catch(() => {}); }
+      if (g !== gen) return;
+      if (ok) pace = pace * 0.8 + (performance.now() - t0) * 0.2;
+      if (now) urgent--; else flying--;
+      fill();
+    };
+    im.addEventListener("load", () => done(true), { once: true }); im.addEventListener("error", () => done(false), { once: true });
+    try { im.fetchPriority = now ? "high" : "low"; } catch (e) {}
+    im.srcset = sources(it.name, SMALL); im.src = `photos/${SMALL[0]}/${it.name}.jpg`;
+  }
+  function fill() {
+    if (!items || urgent) return;
+    const reach = thrifty ? Math.max(innerWidth, innerHeight) : Infinity;
+    const lanes = pace < 300 ? 10 : pace < 800 ? 6 : 3;   // more at once on a quick connection, few on a slow one
+    while (flying < lanes) {
+      let best = null;
+      for (const it of items) if (!it.asked && it.d < reach && (!best || it.d < best.d)) best = it;
+      if (!best) return;
+      ask(best, false);
+    }
+  }
+  function paint() {
+    if (!items) return;
+    const vw = innerWidth, vh = innerHeight, M = 300;
+    for (const it of items) {
+      // the plane comes round again, so a frame is as near as its nearer side
+      let x = mod(it.x - cam.x + it.w, tile.w) - it.w, y = mod(it.y - cam.y + it.h, tile.h) - it.h;
+      if (x >= vw && tile.w - x - it.w < x - vw) x -= tile.w;
+      if (y >= vh && tile.h - y - it.h < y - vh) y -= tile.h;
+      const dx = Math.max(0, x - vw, -(x + it.w)), dy = Math.max(0, y - vh, -(y + it.h));
+      const on = dx < M && dy < M;
+      it.d = dx + dy - 0.5 * ((x + it.w / 2 - vw / 2) * lean.x + (y + it.h / 2 - vh / 2) * lean.y);
+      if (on) {
+        it.f.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`;
+        if (!it.asked && !dx && !dy) ask(it, true);   // in view: now. The rest wait their turn in fill()
+      }
+      if (on !== it.on) {
+        it.f.style.visibility = on ? "" : "hidden"; it.on = on;
+        if (on && have.has(it.name) && it.im.decode) it.im.decode().catch(() => {});   // ready before it comes into view
+      }
+    }
+    fill();
+  }
+  let last = 0;
+  function frame(t) {
+    raf = 0;
+    const dt = Math.min(50, t - last || 16); last = t;
+    if (glide.x || glide.y) {   // the arrow keys: ease toward where they pointed
+      const a = 1 - Math.exp(-dt / 110), dx = glide.x * a, dy = glide.y * a;
+      cam.x += dx; cam.y += dy; glide.x -= dx; glide.y -= dy;
+      if (Math.abs(glide.x) + Math.abs(glide.y) < 0.5) glide.x = glide.y = 0;
+    }
+    if (vel.x || vel.y) {       // a drag let go keeps moving and slows down
+      cam.x += vel.x * dt; cam.y += vel.y * dt;
+      const d = Math.exp(-dt / 320); vel.x *= d; vel.y *= d;
+      if (Math.abs(vel.x) + Math.abs(vel.y) < 0.02) vel.x = vel.y = 0;
+    }
+    paint();
+    if (glide.x || glide.y || vel.x || vel.y) kick();
+  }
+  function kick() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+  function nudge(dx, dy) {
+    if (!moved) { moved = true; const h = document.getElementById("hint"); if (h) h.classList.add("gone"); }
+    const n = Math.hypot(dx, dy); if (n > 0.5) { lean.x = lean.x * 0.8 + (dx / n) * 0.2; lean.y = lean.y * 0.8 + (dy / n) * 0.2; }
+    cam.x += dx; cam.y += dy; paint();
+  }
+  // dragging, with a click told apart from a drag by how far the pointer went
+  let grab = null;
+  main.addEventListener("pointerdown", (e) => {
+    if (!plane || !plane.contains(e.target) || e.button) return;
+    grab = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: performance.now(), far: 0, target: e.target, vx: 0, vy: 0 };
+    vel.x = vel.y = glide.x = glide.y = 0;
+    plane.setPointerCapture(e.pointerId); plane.classList.add("held");
+  });
+  main.addEventListener("pointermove", (e) => {
+    if (!grab || e.pointerId !== grab.id) return;
+    const now = performance.now(), dx = e.clientX - grab.x, dy = e.clientY - grab.y, dt = Math.max(1, now - grab.t);
+    grab.far = Math.max(grab.far, Math.hypot(e.clientX - grab.sx, e.clientY - grab.sy));
+    grab.vx = grab.vx * 0.6 + (-dx / dt) * 0.4; grab.vy = grab.vy * 0.6 + (-dy / dt) * 0.4;
+    grab.x = e.clientX; grab.y = e.clientY; grab.t = now;
+    if (grab.far > 5) nudge(-dx, -dy);
+  });
+  const drop = (e) => {
+    if (!grab || e.pointerId !== grab.id) return;
+    const g = grab; grab = null; if (plane) plane.classList.remove("held");
+    if (e.type === "pointercancel") return;
+    if (g.far <= 5) { if (g.target.dataset && g.target.dataset.i !== undefined) openAt(+g.target.dataset.i); return; }
+    if (!calm && performance.now() - g.t < 80) { vel.x = Math.max(-3, Math.min(3, g.vx)); vel.y = Math.max(-3, Math.min(3, g.vy)); kick(); }
+  };
+  main.addEventListener("pointerup", drop); main.addEventListener("pointercancel", drop);
+  addEventListener("wheel", (e) => {
+    if (!plane || e.ctrlKey) return;
+    e.preventDefault();
+    const unit = e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1;
+    vel.x = vel.y = 0;
+    nudge((e.shiftKey && !e.deltaX ? e.deltaY : e.deltaX) * unit, (e.shiftKey && !e.deltaX ? 0 : e.deltaY) * unit);
+  }, { passive: false });
+  // a photograph reached with the Tab key is brought to the middle of the window
+  main.addEventListener("focusin", (e) => {
+    if (!plane || grab || e.target.dataset.i === undefined || !e.target.matches(":focus-visible")) return;
+    const it = items.find((x) => x.im === e.target); plane.scrollLeft = plane.scrollTop = 0;
+    cam.x = it.x + it.w / 2 - innerWidth / 2; cam.y = it.y + it.h / 2 - innerHeight / 2; vel.x = vel.y = glide.x = glide.y = 0; paint();
+  });
+
+  // ---- one picture: its top-left corner never moves; how much of the page it takes is the only thing that changes ----
+  const ready = new Map();   // the photographs either side of the one shown, fetched ahead
+  function large(name) {
+    const im = pic(name, true);
+    im.sizes = Math.ceil(fit(name) * dense()) + "px"; im.srcset = sources(name, LARGE); im.src = `photos/${LARGE[0]}/${name}.jpg`;
+    return im;
+  }
+  function renderOne() {
+    const home = view === "home", list = listNow();
+    idx = Math.max(0, Math.min(list.length - 1, idx));
+    const name = list[idx][0], one = el("div", "one");
+    main.appendChild(one);
+    syncStrip(false);
+    const im = ready.get(name) || large(name);
+    im.classList.remove("back", "away"); im.style.transform = im.style.opacity = "";   // it may have been swiped away before
+    // until the large copy arrives, the copy the plane already has stands in for it
+    if (have.has(name) && !im.complete) im.style.backgroundImage = `url("${have.get(name)}")`;
+    one.appendChild(im);
+    const prev = el("button", "zone prev"), next = el("button", "zone next");
+    prev.type = next.type = "button"; prev.setAttribute("aria-label", "Previous photograph"); next.setAttribute("aria-label", "Next photograph");
+    prev.addEventListener("click", () => { if (performance.now() - swiped > 400) turn(-1); });
+    next.addEventListener("click", () => { if (performance.now() - swiped > 400) turn(1); });
+    one.append(prev, next);
+    sizeOne();
+    const count = `<span>${idx + 1} / ${list.length}</span>`;
+    // the project's name opens the row of its photographs
+    where.innerHTML = (home ? "" : `<button type="button" id="name" aria-controls="strip" aria-expanded="${strip}">${S[view].num}&ensp;${S[view].title}</button>`) + count;
+    statusEl.textContent = (home ? "" : S[view].title + ", ") + "photograph " + (idx + 1) + " of " + list.length;
+    // the next two and the one before are fetched now, so turning to them shows them at once
+    const near = [1, 2, -1].map((d) => list[idx + d]).filter(Boolean).map((x) => x[0]);
+    for (const k of [...ready.keys()]) if (k !== name && !near.includes(k)) ready.delete(k);
+    ready.set(name, im);
+    for (const n of near) if (!ready.has(n)) { const p = large(n); ready.set(n, p); if (p.decode) p.decode().catch(() => {}); }
+  }
+  // A photograph shown alone is as large as fits: it fills the room under the header and above the foot, stopped by
+  // width or by height. So two photographs of the same shape are always the same size; on a wide window every
+  // photograph ends up the same height, on a phone the same width.
+  function fit(name) {
+    const one = main.querySelector(".one"); if (!one) return innerWidth;
+    const under = 64 + (stripEl.hidden ? 0 : stripEl.offsetHeight);   // the foot, and the row of photographs when it is open
+    const top = one.getBoundingClientRect().top + scrollY, room = Math.max(160, innerHeight - top - under);
+    return Math.round(Math.min(one.clientWidth, room * P[name][0] / P[name][1]));
+  }
+  function sizeOne() {
+    const one = main.querySelector(".one"); if (!one) return;
+    const im = one.querySelector("img"), w = fit(listNow()[idx][0]);
+    im.style.width = w + "px"; im.sizes = Math.ceil(w * dense()) + "px";
+  }
+  function turn(d) {
+    const list = listNow();
+    if (idx + d >= 0 && idx + d < list.length) { idx += d; draw(false); return; }
+    if (view === "home") { idx = d > 0 ? 0 : list.length - 1; draw(false); return; }
+    const n = ORDER[(ORDER.indexOf(view) + d + ORDER.length) % ORDER.length];  // past the last picture is the next project
+    pendingIdx = d > 0 ? 0 : S[n].list.length - 1; go("#" + n);
+  }
+
+  // The row of a project's photographs, opened and shut by the project's name at the foot. The one you are looking
+  // at is in the middle of it; pressing another goes to it. It stays open as you turn, until the name is pressed
+  // again or you leave for the plane.
+  let strip = false, stripOf = null;
+  function syncStrip(jump) {
+    const on = strip && !!S[view] && !!main.querySelector(".one");
+    stripEl.hidden = !on;
+    const b = document.getElementById("name"); if (b) b.setAttribute("aria-expanded", on);
+    if (!on) return;
+    if (stripOf !== view) {
+      row.textContent = ""; stripOf = view; jump = true;
+      S[view].list.forEach(([name], n) => {
+        const th = el("button", "th"), im = pic(name, false);
+        th.type = "button"; th.dataset.n = n; im.draggable = false;
+        im.src = have.get(name) || `photos/${SIZES[0]}/${name}.jpg`;
+        th.appendChild(im); row.appendChild(th);
+      });
+    }
+    [...row.children].forEach((th, n) => { if (n === idx) th.setAttribute("aria-current", "true"); else th.removeAttribute("aria-current"); });
+    const th = row.children[idx];
+    if (th) row.scrollTo({ left: th.offsetLeft + th.offsetWidth / 2 - row.clientWidth / 2, behavior: jump || calm ? "auto" : "smooth" });
+  }
+  function toggleStrip() { strip = !strip; syncStrip(true); sizeOne(); }
+
+  // A finger on one picture. Swiping sideways turns to the next photograph or the one before, as pressing either
+  // half does (past a project's last photograph is the next project's first). Swiping up goes back to the plane.
+  // The picture moves with the finger, so a swipe let go short is taken back. Pinched in, a finger moves the page.
+  let swipe = null, swiped = 0;
+  const pinched = () => !!window.visualViewport && visualViewport.scale > 1.02;
+  if (window.visualViewport) visualViewport.addEventListener("resize", () => root.classList.toggle("zoomed", pinched()));
+  main.addEventListener("pointerdown", (e) => {
+    const one = main.querySelector(".one");
+    if (!one || !one.contains(e.target) || e.button || !e.isPrimary || pinched()) return;
+    const im = one.querySelector("img"); im.classList.remove("back");
+    swipe = { id: e.pointerId, x: e.clientX, y: e.clientY, t: performance.now(), axis: null, raw: 0, v: 0, can: false, im };
+  });
+  addEventListener("pointermove", (e) => {
+    if (!swipe || e.pointerId !== swipe.id) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y, now = performance.now();
+    if (!swipe.axis) { if (Math.hypot(dx, dy) < 10) return; swipe.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y"; }
+    const raw = swipe.axis === "x" ? dx : dy;
+    swipe.can = swipe.axis === "x" || raw < 0;   // sideways turns either way; only upward leaves
+    swipe.v = swipe.v * 0.6 + ((raw - swipe.raw) / Math.max(1, now - swipe.t)) * 0.4; swipe.raw = raw; swipe.t = now;
+    const d = swipe.can ? raw : raw * 0.15;
+    swipe.im.style.transform = swipe.axis === "x" ? `translate3d(${d.toFixed(1)}px,0,0)` : `translate3d(0,${d.toFixed(1)}px,0)`;
+    swipe.im.style.opacity = swipe.can ? (1 - Math.min(1, Math.abs(d) / 260) * 0.75).toFixed(3) : "";
+  });
+  const letGo = (e) => {
+    if (!swipe || e.pointerId !== swipe.id) return;
+    const s = swipe; swipe = null;
+    if (!s.axis) return;   // a press: the halves take it
+    swiped = performance.now();
+    const far = Math.abs(s.raw) > 64 || (Math.abs(s.raw) > 24 && Math.abs(s.v) > 0.5 && Math.sign(s.v) === Math.sign(s.raw));
+    if (e.type === "pointercancel" || !s.can || !far) { s.im.classList.add("back"); s.im.style.transform = s.im.style.opacity = ""; return; }
+    const act = () => { if (s.im.isConnected) s.axis === "y" ? close() : turn(s.raw < 0 ? 1 : -1); };
+    if (calm) { act(); return; }
+    s.im.classList.add("away"); s.im.style.opacity = 0;
+    s.im.style.transform = s.axis === "x" ? `translate3d(${(s.raw + Math.sign(s.raw) * 80).toFixed(1)}px,0,0)` : `translate3d(0,${(s.raw - 80).toFixed(1)}px,0)`;
+    setTimeout(act, 130);
+  };
+  addEventListener("pointerup", letGo); addEventListener("pointercancel", letGo);
+
+  function draw(fade) {
+    main.textContent = ""; where.textContent = ""; plane = null; items = null; vel.x = vel.y = glide.x = glide.y = 0;
+    const wallOn = view === "home" && !open;
+    root.dataset.view = view;
+    shutEl.hidden = wallOn || view === "information";   // the x at the foot: from one photograph back to the plane
+    swEl.hidden = !wallOn || !BYCOLOUR;
+    for (const b of swEl.children) b.setAttribute("aria-pressed", (b.dataset.order === "colour") === colour);
+    if (!S[view]) { strip = false; syncStrip(false); }
+    if (wallOn) root.dataset.plane = ""; else delete root.dataset.plane;
+    document.querySelectorAll(".top a").forEach((a) => { if (a.getAttribute("href") === "#" + view) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    document.title = view === "home" ? "Kevin Celustka" : (view === "information" ? "Information" : S[view].title) + ", Kevin Celustka";
+    if (fade) { root.classList.remove("turned"); void main.offsetWidth; root.classList.add("turned"); }
+    if (view === "information") { main.appendChild(document.getElementById("info").content.cloneNode(true)); shownAt = performance.now(); }
+    else if (wallOn) renderPlane();
+    else renderOne();
+  }
+  function show() {
+    const n = named();
+    if (n !== view || pendingIdx !== null) { view = n; idx = pendingIdx === null ? 0 : pendingIdx; open = false; }
+    pendingIdx = null;
+    draw(true); scrollTo(0, 0); main.focus({ preventScroll: true });
+  }
+  function go(hash) { if (hash === location.hash || (hash === "#home" && !location.hash)) { open = false; idx = 0; show(); } else location.hash = hash; }
+  // A photograph on the plane opens where it belongs: in its project, at its place in that project's sequence.
+  // One that is in no project opens among the others that are in none.
+  function openAt(i) {
+    const name = HOME[i][0], pr = HOME[i][2];
+    if (pr && S[pr]) { pendingIdx = Math.max(0, S[pr].list.findIndex((x) => x[0] === name)); go("#" + pr); return; }
+    open = true; idx = Math.max(0, LOOSE.findIndex((x) => x[0] === name)); draw(true); scrollTo(0, 0);
+  }
+  function close() {   // back to the plane, where you left it
+    if (view === "home") { open = false; draw(true); } else go("#home");
+  }
+
+  addEventListener("hashchange", show);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (a) { // from a picture on the wall into its project, at that picture
+      e.preventDefault();
+      const h = a.getAttribute("href"), key = h.slice(1), p = a.dataset.pic;
+      if (p && S[key]) pendingIdx = Math.max(0, S[key].list.findIndex((x) => x[0] === p));
+      go(h); return;
+    }
+    const t = e.target.closest ? e.target : e.target.parentElement;
+    if (!t) return;
+    if (t.closest("#close")) { close(); return; }
+    if (t.closest("#name")) { toggleStrip(); return; }
+    const sw = t.closest("#sw button");
+    if (sw) {   // the other order of the plane, at the same place on it
+      const want = sw.dataset.order === "colour"; if (want === colour) return;
+      colour = want; try { localStorage.setItem("plane", colour ? "colour" : "mixed"); } catch (e) {}
+      draw(true); return;
+    }
+    const th = t.closest(".th");
+    if (th) { idx = +th.dataset.n; draw(false); }
+  });
+  function step(dx, dy) { // on the plane an arrow key moves it most of a window
+    if (!moved) { moved = true; const h = document.getElementById("hint"); if (h) h.classList.add("gone"); }
+    if (calm) { cam.x += dx * innerWidth * 0.6; cam.y += dy * innerHeight * 0.6; paint(); return; }
+    glide.x += dx * innerWidth * 0.6; glide.y += dy * innerHeight * 0.6; kick();
+  }
+  // The contact form posts to a small Worker that emails Kevin (worker/contact.js); his address is never on the page.
+  const CONTACT = "";
+  let shownAt = 0;
+  document.addEventListener("submit", async (e) => {
+    const f = e.target; if (f.id !== "contact") return;
+    e.preventDefault();
+    const say = (t) => { f.querySelector(".status").textContent = t; }, send = f.querySelector("button");
+    const v = Object.fromEntries(new FormData(f)), name = v.name.trim(), email = v.email.trim(), message = v.message.trim();
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !message) { say("Please give your name, an email address and a message."); return; }
+    if (!CONTACT) { say("This form is not connected yet."); return; }
+    send.disabled = true; say("Sending");
+    try {
+      const r = await fetch(CONTACT, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, message, website: v.website, t: Math.round((performance.now() - shownAt) / 1000) }) });
+      if (!r.ok) throw new Error(r.status);
+      f.reset(); say("Sent. Thank you.");
+    } catch (err) { say("That did not send. Please try again."); }
+    send.disabled = false;
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+    if (e.target.closest && e.target.closest("input, textarea, select")) return;   // typing in the form is just typing
+    const k = e.key, t = e.target, wallOn = view === "home" && !open;
+    if ((k === "Enter" || k === " ") && t.dataset && t.dataset.i !== undefined) { e.preventDefault(); openAt(+t.dataset.i); }
+    else if (k === "ArrowRight" || k === "j") { e.preventDefault(); if (view !== "information") wallOn ? step(1, 0) : turn(1); }
+    else if (k === "ArrowLeft" || k === "k") { e.preventDefault(); if (view !== "information") wallOn ? step(-1, 0) : turn(-1); }
+    else if (wallOn && (k === "ArrowDown" || k === "ArrowUp")) { e.preventDefault(); step(0, k === "ArrowDown" ? 1 : -1); }
+    else if (k >= "1" && k <= "9" && ORDER[+k - 1]) go("#" + ORDER[+k - 1]);
+    else if (k === "Escape" && !wallOn && view !== "information") { if (strip && S[view]) toggleStrip(); else close(); }
+  });
+  // Inside a frame (as in this preview) the keys go to whichever page was last clicked. Take them as soon as the
+  // page is drawn, and again whenever the pointer comes onto it, so the arrow keys work without a click first.
+  const takeKeys = () => {
+    if (document.activeElement && document.activeElement !== document.body && document.activeElement !== main) return;
+    try { window.focus(); } catch (e) {}
+    main.focus({ preventScroll: true });
+  };
+  addEventListener("load", takeKeys); addEventListener("pageshow", takeKeys);
+  document.addEventListener("pointerenter", takeKeys, true); document.addEventListener("mouseover", takeKeys);
+  let rs = 0; addEventListener("resize", () => { clearTimeout(rs); rs = setTimeout(() => { layPlane(); sizeOne(); syncStrip(true); }, 80); });
+
+  draw(false); takeKeys();
+})();
+</script>
+</body>
+</html>
