@@ -665,7 +665,7 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
     glide.x += dx * innerWidth * 0.6; glide.y += dy * innerHeight * 0.6; kick();
   }
   // The contact form posts to a small Worker that emails Kevin (worker/contact.js); his address is never on the page.
-  const CONTACT = "";
+  const CONTACT = "https://kevincelustka.com/api/contact";
   let shownAt = 0;
   document.addEventListener("submit", async (e) => {
     const f = e.target; if (f.id !== "contact") return;
