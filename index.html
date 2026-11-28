@@ -247,18 +247,13 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
   let view = named(), idx = 0, open = false, pendingIdx = null;
   let plane = null, items = null, tile = { w: 1, h: 1 }, cam = null, vel = { x: 0, y: 0 }, glide = { x: 0, y: 0 }, raf = 0, moved = false;
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // A test, off for everyone unless asked for (Kevin, Nov 27: "a variant of the global view that gives the plane a
-  // feeling of dimension where the photos at each sizes appear to be closer or further from the viewer based on
-  // their movement relative to one another ... subtle without the photos overlapping each other ... Let's keep it
-  // as a test for now"). Going to #depth turns it on in this browser: the large photographs move a little more than
-  // the plane, as if nearer. #depth2 is stronger: the rest also move a little less, as if further back. #flat turns
-  // it off. It is never on for someone who has asked their device for less motion.
-  let depth = 0; try { depth = +localStorage.getItem("depth") || 0; } catch (e) {}
-  function depthHash() {
-    const d = { flat: 0, depth: 1, depth2: 2 }[location.hash.slice(1)]; if (d === undefined) return;
-    depth = d; try { localStorage.setItem("depth", d); } catch (e) {}
-  }
-  depthHash();
+  // Depth (Kevin, Nov 27: "a variant of the global view that gives the plane a feeling of dimension where the photos
+  // at each sizes appear to be closer or further from the viewer based on their movement relative to one another
+  // ... subtle without the photos overlapping each other"; after trying two strengths, "Let's ship the more subtle
+  // one"). As the plane is moved the large photographs move a little more than it does, as if nearer. Not for
+  // someone who has asked their device for less motion. (While it was a test a browser could remember a strength:
+  // that is no longer read, and is cleared here.)
+  try { localStorage.removeItem("depth"); } catch (e) {}
 
   function pic(name, eager) {
     const [w, h, alt] = P[name], im = document.createElement("img");
@@ -375,12 +370,12 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
     }
     const was = cam && moved ? [(cam.x + vw / 2) / tile.w, (cam.y + vh / 2) / tile.h] : null;
     tile = { w: w0 * k, h: h0 * k };
-    // The depth test: how far each frame may be moved. Its room is the distance to the nearest other frame (or place
+    // Depth: how far each large frame may be moved. Its room is the distance to the nearest other frame (or place
     // kept empty at arrival), measured along whichever of across and down has the more; it is never moved by more
-    // than 0.45 of that in either, so two neighbours each moved toward the other still cannot meet. Large frames
-    // are moved outward from the middle of the window (nearer), the rest, in the stronger test, inward (further).
+    // than 0.45 of that in either, so two neighbours each moved toward the other still cannot meet. It is moved
+    // outward from the middle of the window, which is how something nearer than the plane would move.
     for (const it of items) it.reach = 0;
-    if (depth && !calm) {
+    if (!calm) {
       const kept = o.avoid.map((a) => ({ x: a.x0 * k, y: a.y0 * k, w: (a.x1 - a.x0) * k, h: (a.y1 - a.y0) * k }));
       const apart = (a, b) => {
         let gx = Math.abs(a.x + a.w / 2 - b.x - b.w / 2), gy = Math.abs(a.y + a.h / 2 - b.y - b.h / 2);
@@ -389,11 +384,12 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
         return Math.max(gx - (a.w + b.w) / 2, gy - (a.h + b.h) / 2);
       };
       for (const a of items) {
-        const most = a.kim > 1 ? 0.14 * cw0 * k : depth > 1 ? -0.08 * cw0 * k : 0; if (!most) continue;
+        if (a.kim < 2) continue;
+        const most = 0.14 * cw0 * k;
         let room = Infinity;
         for (const b of items) if (b !== a) room = Math.min(room, apart(a, b));
         for (const b of kept) room = Math.min(room, apart(a, b));
-        a.reach = Math.sign(most) * Math.min(Math.abs(most), 0.45 * Math.max(0, room));
+        a.reach = Math.min(most, 0.45 * Math.max(0, room));
       }
     }
     cam = was ? { x: was[0] * tile.w - vw / 2, y: was[1] * tile.h - vh / 2 } : { x: sx * k, y: sy * k };   // arrive
@@ -442,7 +438,7 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
       const on = dx < M && dy < M;
       it.d = dx + dy - 0.5 * ((x + it.w / 2 - vw / 2) * lean.x + (y + it.h / 2 - vh / 2) * lean.y);
       if (on) {
-        if (it.reach) {   // the depth test: moved with its place in the window, by its reach at the window's edge and nothing in the middle
+        if (it.reach) {   // depth: moved with its place in the window, by its reach at the window's edge and nothing in the middle
           x += it.reach * Math.max(-1, Math.min(1, (x + it.w / 2 - vw / 2) / (vw / 2 + it.w / 2)));
           y += it.reach * Math.max(-1, Math.min(1, (y + it.h / 2 - vh / 2) / (vh / 2 + it.h / 2)));
         }
@@ -673,7 +669,6 @@ html.single .sr{top:0}   /* else the spoken line sits just under the photograph'
     else renderOne();
   }
   function show() {
-    depthHash();
     const n = named();
     if (n !== view || pendingIdx !== null) { view = n; idx = pendingIdx === null ? 0 : pendingIdx; open = false; }
     pendingIdx = null;
